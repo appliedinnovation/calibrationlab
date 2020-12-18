@@ -11,7 +11,7 @@ class CameraCalibration():
     """This class performs camera calibration."""
 
     def __init__(self):
-        self.chessboard_size = (9, 6)
+        self.chessboard_size = (8, 6)
         self.record_min_num_frames = MIN_CALIBRATION_FRAMES
         self.record_cnt = 0
         self._recording = False
