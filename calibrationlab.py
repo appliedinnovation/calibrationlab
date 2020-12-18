@@ -140,7 +140,7 @@ class MainWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_save_capture, self.menu_save_capture)
         self.Bind(wx.EVT_MENU, self.on_exit, menu_exit)
 
-    def capture_video(self, device=0, fps=30, size=(640, 480)):
+    def capture_video(self, device=0, fps=30, size=(320, 240)):
         """Sets periodic screen capture.
 
         Args:
@@ -319,7 +319,7 @@ def main():
     """Method creating main window."""
     app = wx.App(False)
     frame = MainWindow(None, "Camera")
-    frame.capture_video(device=0, fps=30, size=(640, 480))
+    frame.capture_video(device=0, fps=30, size=(320, 240))
     app.SetTopWindow(frame)
     app.MainLoop()
 
