@@ -14,6 +14,8 @@ class Camera():
         self._fps = 30
         self.image_width = CAMERA_WIDTH
         self.image_height = CAMERA_HEIGHT
+        self.output_width = 224
+        self.output_height = 224
 
     @property
     def device(self):
@@ -52,7 +54,12 @@ class Camera():
         Returns:
             retval, image: True if success; video image frame.
         """
-        return self.capture.read()
+        # return self.capture.read()
+        retval, frame = self.capture.read()
+        if retval:
+            return retval, cv2.resize(frame, (self.output_height, self.output_width))
+        else:
+            return retval, frame
 
     def release(self):
         """Closes video file or capturing device."""
