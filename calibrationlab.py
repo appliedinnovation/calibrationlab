@@ -10,8 +10,8 @@ from calibrationpanel import CalibrationPanel
 __author__ = "Jevgenijs Pankovs"
 __license__ = "GNU GPL 3.0 or later"
 
-SCREEN_WIDTH = 640
-SCREEN_HEIGHT = 480
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 240
 
 class MainWindow(wx.Frame):
     """Base class for the UI layout."""
@@ -122,7 +122,7 @@ class MainWindow(wx.Frame):
 
         menu2 = wx.Menu()
         for i in range(0, 5):
-            menu_id = wx.NewId()
+            menu_id = wx.NewIdRef(count=1)
             self.camera_menu_ids.append(menu_id)
             menu_item = menu2.Append(menu_id, f"Camera {i}", kind=wx.ITEM_RADIO)
             self.Bind(wx.EVT_MENU, self.on_camera, menu_item)
@@ -140,7 +140,7 @@ class MainWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_save_capture, self.menu_save_capture)
         self.Bind(wx.EVT_MENU, self.on_exit, menu_exit)
 
-    def capture_video(self, device=0, fps=30, size=(320, 240)):
+    def capture_video(self, device=0, fps=30, size=(640, 480)):
         """Sets periodic screen capture.
 
         Args:
@@ -160,7 +160,7 @@ class MainWindow(wx.Frame):
 
         # set up periodic screen capture
         self.timer = wx.Timer(self)
-        self.timer.Start(1000. / self.camera.fps)
+        self.timer.Start(int(1000.0 / self.camera.fps))
         self.Bind(wx.EVT_TIMER, self.on_next_frame)
 
     def on_camera(self, event):
@@ -319,7 +319,7 @@ def main():
     """Method creating main window."""
     app = wx.App(False)
     frame = MainWindow(None, "Camera")
-    frame.capture_video(device=0, fps=30, size=(320, 240))
+    frame.capture_video(device=0, fps=25, size=(320, 240))
     app.SetTopWindow(frame)
     app.MainLoop()
 

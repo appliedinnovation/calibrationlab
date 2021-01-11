@@ -5,13 +5,13 @@ import numpy as np
 import cv2
 from event import Event
 
-MIN_CALIBRATION_FRAMES = 20
+MIN_CALIBRATION_FRAMES = 5
 
 class CameraCalibration():
     """This class performs camera calibration."""
 
     def __init__(self):
-        self.chessboard_size = (8, 6)
+        self.chessboard_size = (6, 8)
         self.record_min_num_frames = MIN_CALIBRATION_FRAMES
         self.record_cnt = 0
         self._recording = False
@@ -20,6 +20,8 @@ class CameraCalibration():
         self._camera_matrix = None
         self._dist_coeff = None
         self._calibration_file = None
+        self._new_camera_matrix = None
+        self._roi = None
 
         # events
         self.calibrated = Event()
@@ -165,9 +167,22 @@ class CameraCalibration():
         # undistort
         height, width = frame.shape[:2]
         size = (width, height)
+        new_size=(224,224)
+        # temp_dist=np.array([[0,0,0,0,0]])
+        temp_dist=self._dist_coeff
         new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
-            self._camera_matrix, self._dist_coeff, size, 1, size)
-        dst = cv2.undistort(frame, self._camera_matrix, self._dist_coeff, None, new_camera_matrix)
+            self._camera_matrix,temp_dist, size, 0, new_size,centerPrincipalPoint=False)
+        self._new_camera_matrix=new_camera_matrix
+        self._roi=roi
+        # print("camera_matrix")
+        # print(self.camera_matrix)
+        # print("new camera_matrix")
+        # print(new_camera_matrix)
+        # print(roi)
+        # print(self._dist_coeff)
+        
+        dst = cv2.undistort(frame, self._camera_matrix, temp_dist, None, new_camera_matrix)
+        print(dst.shape)
 
         # crop the image
         x, y, w, h = roi
@@ -175,14 +190,19 @@ class CameraCalibration():
         new_image = np.zeros((height, width, 3), np.uint8)
         new_image[y:y+h, x:x+w] = dst
         return new_image
+        # return dst
 
     def save_calibration(self, pathname):
         """Save camera calibration parameters in json file."""
         data = {
             "camera_matrix": self._camera_matrix.tolist(),
             "dist_coeff": self._dist_coeff.tolist(),
-            "mean_error": self._mean_error
+            "mean_error": self._mean_error,
+            "new_camera_matrix": self._new_camera_matrix.tolist(),
+            "roi": self._roi
+
             }
+        print(data)
         with open(pathname, "w") as file:
             json.dump(data, file)
             self._calibration_file = pathname
